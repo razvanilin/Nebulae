@@ -11,7 +11,12 @@ private var heightCorrection : Vector3;
 
 function Start()
 {
-	
+	if(networkView.isMine){
+       GetComponent(Camera).enabled = true;
+    }
+    else{
+       GetComponent(Camera).enabled = false;
+    }	
 }
  
 function FixedUpdate () {

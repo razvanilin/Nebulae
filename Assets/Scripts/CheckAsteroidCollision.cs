@@ -7,7 +7,7 @@ public class CheckAsteroidCollision : MonoBehaviour {
 	public Transform explosion;
 	public GameObject asteroid;
 	public AudioClip explosionClip;
-
+	
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.tag == "Laser")
@@ -16,11 +16,17 @@ public class CheckAsteroidCollision : MonoBehaviour {
 
 			if (asteroidLife <= 0)
 			{
-				Instantiate(explosion, transform.position, transform.rotation);
-				AudioSource.PlayClipAtPoint(explosionClip, transform.position);
-				Destroy(asteroid);
+				networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
 			}
 		}
+	}
+
+	[RPC]
+	void DestroyAsteroid()
+	{
+		Instantiate(explosion, transform.position, transform.rotation);
+		AudioSource.PlayClipAtPoint(explosionClip, transform.position);
+		Destroy(asteroid);
 	}
 	
 }
