@@ -4,7 +4,8 @@ using System.Collections;
 public class GameController : MonoBehaviour {
 
 	//public AudioClip backgroundMusic;
-
+	private float delayTime = 0.5f;
+	private float tempTime = 0f;
 	// Use this for initialization
 	void Start () 
 	{
@@ -12,5 +13,22 @@ public class GameController : MonoBehaviour {
 		Screen.showCursor = false;*/
 
 		//AudioSource.PlayClipAtPoint(backgroundMusic, transform.position);
+	}
+
+	void Update()
+	{
+		tempTime += Time.deltaTime;
+		if (Input.GetButton("Lock Mouse") && Screen.lockCursor && !Screen.showCursor && tempTime >= delayTime)
+		{
+			Screen.lockCursor = false;
+			Screen.showCursor = true;
+			tempTime = 0f;
+		}
+		if (Input.GetButton("Lock Mouse") && !Screen.lockCursor && Screen.showCursor && tempTime >= delayTime)
+		{
+			Screen.lockCursor = true;
+			Screen.showCursor = false;
+			tempTime = 0f;
+		}
 	}
 }

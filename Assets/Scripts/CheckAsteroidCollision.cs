@@ -25,7 +25,7 @@ public class CheckAsteroidCollision : MonoBehaviour {
 	void DestroyAsteroid()
 	{
 		Instantiate(explosion, transform.position, transform.rotation);
-		AudioSource.PlayClipAtPoint(explosionClip, transform.position);
+		AudioSource.PlayClipAtPoint(explosionClip, transform.position, 1f);
 		Destroy(asteroid);
 	}
 	

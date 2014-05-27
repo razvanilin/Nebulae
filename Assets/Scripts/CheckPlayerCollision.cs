@@ -9,12 +9,14 @@ public class CheckPlayerCollision : MonoBehaviour {
 	public GameObject player;
 	public PlayerController playerContr;
 
+	private AudioSource audioSource;
 	private int lifeLeft;
 	public int LifeLeft {get{return lifeLeft;}}
 
 	void Start()
 	{
 		lifeLeft = playerLife;
+		audioSource = GetComponent<AudioSource>();
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -26,6 +28,8 @@ public class CheckPlayerCollision : MonoBehaviour {
 		if (other.tag ==  "Asteroid")
 		{
 			lifeLeft -= 20;
+			if (!audioSource.isPlaying)
+				audioSource.Play();
 		}
 		if (lifeLeft <= 0)
 		{

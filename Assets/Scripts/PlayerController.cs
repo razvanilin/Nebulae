@@ -20,10 +20,14 @@ public class PlayerController : MonoBehaviour {
 	public float acceleration = 0f;
 	private float nextFire = 0f;
 	private bool haltFlag;
+	private AudioListener listener;
 
 	void Start()
 	{
 		haltFlag = false;
+		listener = GetComponent<AudioListener>();
+		if (!networkView.isMine)
+			listener.enabled = false;
 	}
 
 	void FixedUpdate ()
@@ -90,7 +94,7 @@ public class PlayerController : MonoBehaviour {
 		Instantiate(laser, gun2.transform.position, gun2.transform.rotation);
 		nextFire = 0f;
 		if (networkView.isMine)
-			AudioSource.PlayClipAtPoint(shotClip, transform.position, 0.5f);
+			AudioSource.PlayClipAtPoint(shotClip, transform.position, 0.3f);
 	}
 
 	void Update()
