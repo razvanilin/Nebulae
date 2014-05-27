@@ -13,11 +13,15 @@ public class CheckAsteroidCollision : MonoBehaviour {
 		if (other.tag == "Laser")
 		{
 			asteroidLife--;
+		}
+		if (other.tag == "Player")
+		{
+			asteroidLife -= 5;
+		}
 
-			if (asteroidLife <= 0)
-			{
-				networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
-			}
+		if (asteroidLife <= 0)
+		{
+			networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
 		}
 	}
 

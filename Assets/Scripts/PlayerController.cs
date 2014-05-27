@@ -63,20 +63,8 @@ public class PlayerController : MonoBehaviour {
 			}
 
 
-			//Engine particle effects
-			acceleration = Mathf.Lerp(acceleration, tempAcc, Time.deltaTime * accelerationDamp);
-			//enginePower.Acceleration = tempAcc;
-			//particles.networkView.RPC("EngineEmission", RPCMode.All, tempAcc);
-			//EngineEmission(tempAcc);
-
-			rigidbody.velocity = (transform.forward * acceleration) 
-				+ (transform.up * Input.GetAxis("Vertical") * strafeSpeed)
-					+ (transform.right * Input.GetAxis("Horizontal") * strafeSpeed);
-
-			//rigidbody.velocity = transform.forward * Input.GetAxis("Horizontal") * strafeSpeed;
-			//rigidbody.velocity += transform.up * Input.GetAxis("Vertical") * strafeSpeed;
-
-			rigidbody.angularVelocity = transform.forward * Input.GetAxis("Tilt") * tiltSpeed;
+			//Engine particle effect
+			networkView.RPC("MovePlayer", RPCMode.All, tempAcc);
 
 			nextFire += Time.deltaTime;
 			// Shooting lasers
@@ -88,6 +76,17 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	[RPC]
+	void MovePlayer(float tempAcc)
+	{
+		acceleration = Mathf.Lerp(acceleration, tempAcc, Time.deltaTime * accelerationDamp);
+		rigidbody.velocity = (transform.forward * acceleration) 
+			+ (transform.up * Input.GetAxis("Vertical") * strafeSpeed)
+				+ (transform.right * Input.GetAxis("Horizontal") * strafeSpeed);
+		
+		rigidbody.angularVelocity = transform.forward * Input.GetAxis("Tilt") * tiltSpeed;
+	}
+
+	[RPC]
 	void LaserShot()
 	{
 		Instantiate(laser, gun1.transform.position, gun1.transform.rotation);
@@ -96,21 +95,6 @@ public class PlayerController : MonoBehaviour {
 		if (networkView.isMine)
 			AudioSource.PlayClipAtPoint(shotClip, transform.position, 0.3f);
 	}
-
-	void Update()
-	{
-
-	}
-	/*
-	[RPC]
-	void EngineEmission(float acc)
-	{
-		if (particles.minEmission <= maxEmission || acc <= 0)
-		{
-			particles.minEmission = acc * engineEmission;
-			particles.maxEmission = acc * engineEmission;
-		}
-	}*/
 
 	public float Acceleration
 	{

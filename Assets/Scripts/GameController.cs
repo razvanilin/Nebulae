@@ -31,4 +31,15 @@ public class GameController : MonoBehaviour {
 			tempTime = 0f;
 		}
 	}
+
+	void OnGUI()
+	{
+		if (!Screen.lockCursor && Screen.showCursor)
+		{
+			if (GUI.Button(new Rect(100, 100, 250, 100), "Exit"))
+			{
+				Application.Quit();
+			}
+		}
+	}
 }
