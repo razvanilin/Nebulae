@@ -4,23 +4,25 @@ using System.Collections;
 public class LaserShot : MonoBehaviour {
 
 	public float speed;
-	public float life;
+	public float laserDistance;
 	public ParticleEmitter destroyEffect;
 
-	private float timePassed;
+	private Vector3 startPosition;
+	private float distanceTraveled;
 	
 	void Start () 
 	{
-		rigidbody.velocity = transform.forward * speed;
-
+		startPosition = transform.position;
+		rigidbody.velocity = transform.forward * Time.deltaTime * speed;
 	}
 
 	void Update()
 	{
-		timePassed += Time.deltaTime;
+		distanceTraveled = Vector3.Distance(transform.position, startPosition);
 
-		if (timePassed >= life)
+		if (distanceTraveled >= laserDistance)
 		{
+
 			Destroy(gameObject);
 			DestroyChildren();
 		}

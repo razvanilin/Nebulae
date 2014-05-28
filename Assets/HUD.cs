@@ -102,16 +102,6 @@ public class HUD : MonoBehaviour
 								        "",
 								        currentStyle);
 							}
-							else
-							{
-								/*InitStyles(outRangeCol);
-								GUI.Box(new Rect(
-									targetScreenPos.x-(hudTargetSize/2), 
-									cam.pixelHeight-targetScreenPos.y-(hudTargetSize/2), 
-									hudTargetSize, hudTargetSize),
-								        "",
-								        currentStyle);*/
-							}
 						}
 					}
 				}
