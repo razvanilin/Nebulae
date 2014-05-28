@@ -1,56 +1,130 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class HUD : MonoBehaviour 
 {
-	public Transform target;
 	public float hudTargetSize = 20f;
+	public int maximumTargets = 50;
+	public Camera cam;
 
-	private Camera cam;
 	private Vector3 targetScreenPos;
 	private float width = 0f, height = 0f;
 	private GUIStyle currentStyle = null;
+	private Dictionary<GameObject, bool> ships;
+	private Color inRangeCol = new Color(0f, 1f, 0f, 0.5f);
+	private Color outRangeCol = new Color(1f, 0f, 0f, 0.5f);
 
 	void Start()
 	{
-		cam = GetComponent<Camera>();
+		ships = new Dictionary<GameObject, bool>();
 	}
 
 	void Update () 
 	{
-		targetScreenPos = cam.WorldToScreenPoint(target.position);
+/*		Dictionary<GameObject, bool> removeList = ships;
+
+		foreach(GameObject ship in removeList.Keys)
+		{
+			if (ship == null)
+			{
+				ships.Remove(ship);
+			}
+		}*/
+	}
+
+	void OnTriggerEnter(Collider other)
+	{
+
+		if (networkView.isMine && other.tag == "Player")
+		{
+			bool existFlag = false;
+			if (ships != null)
+			{
+				foreach (GameObject ship in ships.Keys)
+				{
+					if (ship.GetInstanceID() == other.gameObject.GetInstanceID())
+					{
+						existFlag = true;
+						ships[ship] = true;
+						break;
+					}
+				}
+				if (!existFlag)
+					ships.Add(other.gameObject, true);
+			}
+			else
+				ships.Add(other.gameObject, true);
+		}
+	}
+
+	void OnTriggerExit (Collider other)
+	{
+		if (networkView.isMine && other.tag == "Player")
+		{
+			if (ships.ContainsKey(other.gameObject))
+			{
+				ships[other.gameObject] = false;
+			}
+		}
 	}
 
 	void OnGUI()
 	{
-		if (targetScreenPos.x <= cam.pixelWidth-50 && targetScreenPos.x >= 0)
+		if (networkView.isMine)
 		{
-			width = targetScreenPos.x;
-		}
-		if (targetScreenPos.y <= cam.pixelHeight-50 && targetScreenPos.y >= 0)
-		{
-			height = targetScreenPos.y;
-		}
+			bool found = true;
+			if (ships != null)
+			{
+				foreach(GameObject ship in ships.Keys)
+				{
+					if (ship != null)
+					{
+						//Debug.Log(ships[ship]);
+						targetScreenPos = cam.WorldToScreenPoint(ship.transform.position);
+						if (targetScreenPos.x <= cam.pixelWidth && targetScreenPos.x >= 0)
+						{
+							width = targetScreenPos.x;
+						}
+						if (targetScreenPos.y <= cam.pixelHeight && targetScreenPos.y >= 0)
+						{
+							height = targetScreenPos.y;
+						}
 
-		if (targetScreenPos.z >= 0)
-		{
-			InitStyles();
-			GUI.Box(new Rect(
-				width-(hudTargetSize/2), 
-				cam.pixelHeight-height-(hudTargetSize/2), 
-				hudTargetSize, hudTargetSize),
-			        "",
-			        currentStyle);
+						if (targetScreenPos.z >= 0)
+						{
+							if (ships[ship]) {
+								InitStyles(inRangeCol);
+								GUI.Box(new Rect(
+									targetScreenPos.x-(hudTargetSize/2), 
+									cam.pixelHeight-targetScreenPos.y-(hudTargetSize/2), 
+									hudTargetSize, hudTargetSize),
+								        "",
+								        currentStyle);
+							}
+							else
+							{
+								/*InitStyles(outRangeCol);
+								GUI.Box(new Rect(
+									targetScreenPos.x-(hudTargetSize/2), 
+									cam.pixelHeight-targetScreenPos.y-(hudTargetSize/2), 
+									hudTargetSize, hudTargetSize),
+								        "",
+								        currentStyle);*/
+							}
+						}
+					}
+				}
+			}
 		}
-
 	}
 
-	private void InitStyles()	
+	private void InitStyles(Color col)	
 	{
 		if( currentStyle == null )	
 		{			
 			currentStyle = new GUIStyle( GUI.skin.box );			
-			currentStyle.normal.background = MakeTex( 2, 2, new Color( 0f, 1f, 0f, 0.5f ) );
+			currentStyle.normal.background = MakeTex( 2, 2, col);
 		}
 	}
 

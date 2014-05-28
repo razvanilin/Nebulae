@@ -28,10 +28,13 @@ public class LaserShot : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
-		ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
-		//emitter.Emit();
-		Destroy(gameObject);
-		DestroyChildren();
+		if (other.tag != "Radar")
+		{
+			ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
+			//emitter.Emit();
+			Destroy(gameObject);
+			DestroyChildren();
+		}
 	}
 
 	void DestroyChildren()

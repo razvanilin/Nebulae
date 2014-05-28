@@ -22,7 +22,7 @@ public class NetworkManager : MonoBehaviour {
 	void OnServerInitialized()
 	{
 		Debug.Log("Server Initializied");
-		//Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
+		Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
 		Screen.lockCursor = true;
 		Screen.showCursor = false;
 		SpawnPlayer();
