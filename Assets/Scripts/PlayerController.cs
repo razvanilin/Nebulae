@@ -31,11 +31,6 @@ public class PlayerController : MonoBehaviour {
 		listener = GetComponent<AudioListener>();
 		if (!networkView.isMine)
 			listener.enabled = false;
-		else
-		{
-			playerBody.tag = "Main Player";
-			tag = "Main Player";
-		}
 	}
 
 	void FixedUpdate ()

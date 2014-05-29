@@ -10,14 +10,12 @@ public class GameController : MonoBehaviour {
 	//public AudioClip backgroundMusic;
 	private float delayTime = 0.5f;
 	private float tempTime = 0f;
+	private SceneFadeInOut sceneFadeIn;
 	// Use this for initialization
 	void Start () 
 	{
-
-		/*Screen.lockCursor = true;*/
 		Screen.showCursor = false;
-
-		//AudioSource.PlayClipAtPoint(backgroundMusic, transform.position);
+		sceneFadeIn = GameObject.FindGameObjectWithTag("Fader").GetComponent<SceneFadeInOut>();
 	}
 
 	void Update()

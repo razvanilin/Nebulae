@@ -1,58 +1,68 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviour {
 
 	public GameObject playerPrefab;
 	public GameObject asteroidPrefab;
 	public GameObject introObject;
+	public AudioClip playerConnectedClip;
+	public AudioClip playerDisconnectedClip;
 
 	private const string typeName = "Nebulae_V0.0.1_TestServer";
 	private const string gameName = "Nebulae Space";
 	private HostData[] hostList;
-	
-	private void StartServer()
+	private SceneFadeInOut sceneFadeIn;
+	private Dictionary<NetworkPlayer, KeyValuePair<string, float>> playerList = new Dictionary<NetworkPlayer, KeyValuePair<string, float>>();
+	private float playerTimeDisplay = 5f;
+	private float timePassed = 0f;
+
+	void Start()
 	{
-		Random rnd = new Random();
-		int port = Random.Range(20000, 25000);
-		Debug.Log(port);
-		Network.InitializeServer(4, port, !Network.HavePublicAddress());
-		MasterServer.RegisterHost(typeName, gameName);
+		sceneFadeIn = GameObject.FindGameObjectWithTag("Fader").GetComponent<SceneFadeInOut>();
 	}
 
 	void OnServerInitialized()
 	{
+		sceneFadeIn.EndScene();
 		Debug.Log("Server Initializied");
 		Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
-		SpawnPlayer();
+		StartCoroutine(CRoutine());
+		//SpawnPlayer();
 	}
 
-	private void RefreshHostList()
-	{
-		MasterServer.RequestHostList(typeName);
-	}
-	
 	void OnMasterServerEvent(MasterServerEvent msEvent)
 	{
 		if (msEvent == MasterServerEvent.HostListReceived)
 			hostList = MasterServer.PollHostList();
 	}
 
-	private void JoinServer(HostData hostData)
-	{
-		Network.Connect(hostData);
-	}
-	
 	void OnConnectedToServer()
 	{
+		sceneFadeIn.EndScene();
 		Debug.Log("Server Joined");
-		SpawnPlayer();
+		StartCoroutine(CRoutine());
 	}
 
-	private void SpawnPlayer()
+	void OnPlayerConnected(NetworkPlayer playerConnection)
 	{
-		Network.Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
-		Destroy(introObject);
+		KeyValuePair<string, float> pair = new KeyValuePair<string, float>("Connected Display", 0f);
+		playerList.Add(playerConnection, pair);
+		AudioSource.PlayClipAtPoint(playerConnectedClip, Vector3.zero, 1f);
+	}
+
+	void OnPlayerDisconnected(NetworkPlayer playerConnection)
+	{
+		playerList.Remove(playerConnection);
+		AudioSource.PlayClipAtPoint(playerDisconnectedClip, Vector3.zero, 1f);
+		Network.RemoveRPCs(playerConnection);
+		Network.DestroyPlayerObjects(playerConnection);
+	}
+
+	void Update()
+	{
+
 	}
 
 	void OnGUI()
@@ -75,5 +85,38 @@ public class NetworkManager : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	private void StartServer()
+	{
+		Random rnd = new Random();
+		int port = Random.Range(20000, 25000);
+		Debug.Log(port);
+		Network.InitializeServer(4, port, !Network.HavePublicAddress());
+		MasterServer.RegisterHost(typeName, gameName);
+	}
+
+	private void JoinServer(HostData hostData)
+	{
+		Network.Connect(hostData);
+	}
+
+	IEnumerator CRoutine()
+	{
+		float timetowait = 1;
+		yield return new WaitForSeconds(timetowait);
+		SpawnPlayer();
+		//sceneFadeIn.StartScreen();
+	}
+
+	private void RefreshHostList()
+	{
+		MasterServer.RequestHostList(typeName);
+	}
+
+	private void SpawnPlayer()
+	{
+		Network.Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+		Destroy(introObject);
 	}
 }

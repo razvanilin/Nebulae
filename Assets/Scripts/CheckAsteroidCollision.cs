@@ -21,7 +21,7 @@ public class CheckAsteroidCollision : MonoBehaviour {
 
 		if (asteroidLife <= 0)
 		{
-			networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
+			networkView.RPC("DestroyAsteroid", RPCMode.All);
 		}
 	}
 

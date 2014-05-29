@@ -9,6 +9,7 @@ public class LaserShot : MonoBehaviour {
 
 	private Vector3 startPosition;
 	private float distanceTraveled;
+	private GameObject[] playerBody;
 	
 	void Start () 
 	{
@@ -18,6 +19,7 @@ public class LaserShot : MonoBehaviour {
 
 	void Update()
 	{
+
 		distanceTraveled = Vector3.Distance(transform.position, startPosition);
 
 		if (distanceTraveled >= laserDistance)
@@ -30,12 +32,16 @@ public class LaserShot : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.tag != "Radar" && other.tag != "Main Player")
+		if (networkView.isMine)
 		{
-			ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
-			//emitter.Emit();
-			Destroy(gameObject);
-			DestroyChildren();
+		//playerBody = GameObject.FindGameObjectsWithTag("Player Body");
+			if (other.tag != "Radar")
+			{
+				ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
+				//emitter.Emit();
+				Destroy(gameObject);
+				DestroyChildren();
+			}
 		}
 	}
 
