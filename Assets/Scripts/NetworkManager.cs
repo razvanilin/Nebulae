@@ -9,12 +9,13 @@ public class NetworkManager : MonoBehaviour {
 	public GameObject introObject;
 	public AudioClip playerConnectedClip;
 	public AudioClip playerDisconnectedClip;
+	public string playerName = "Pilot";
 
 	private const string typeName = "Nebulae_V0.0.1_TestServer";
 	private const string gameName = "Nebulae Space";
 	private HostData[] hostList;
 	private SceneFadeInOut sceneFadeIn;
-	private Dictionary<NetworkPlayer, KeyValuePair<string, float>> playerList = new Dictionary<NetworkPlayer, KeyValuePair<string, float>>();
+	private Dictionary<NetworkPlayer, string> playerList = new Dictionary<NetworkPlayer, string>();
 	private float playerTimeDisplay = 5f;
 	private float timePassed = 0f;
 
@@ -47,8 +48,7 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnPlayerConnected(NetworkPlayer playerConnection)
 	{
-		KeyValuePair<string, float> pair = new KeyValuePair<string, float>("Connected Display", 0f);
-		playerList.Add(playerConnection, pair);
+		playerList.Add(playerConnection, playerName);
 		AudioSource.PlayClipAtPoint(playerConnectedClip, Vector3.zero, 1f);
 	}
 
@@ -69,6 +69,7 @@ public class NetworkManager : MonoBehaviour {
 	{
 		if (!Network.isClient && !Network.isServer)
 		{
+			playerName = GUI.TextField(new Rect(100, 400, 300, 25), playerName, 25);
 			if (GUI.Button(new Rect(100, 100, 250, 100), "Start Server"))
 			{
 				StartServer();
@@ -82,6 +83,20 @@ public class NetworkManager : MonoBehaviour {
 				{
 					if (GUI.Button(new Rect(400, 100 + (110 * i), 300, 100), hostList[i].gameName + "_" + i))
 						JoinServer(hostList[i]);
+				}
+			}
+		}
+
+		if (Input.GetButton("Score Window"))
+		{
+			if (playerList != null)
+			{
+				int i = 0;
+				foreach(NetworkPlayer pilot in playerList.Keys)
+				{
+					Debug.Log(playerList[pilot]);
+					GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerList[pilot]);
+					i++;
 				}
 			}
 		}

@@ -10,48 +10,44 @@ public class LaserShot : MonoBehaviour {
 	private Vector3 startPosition;
 	private float distanceTraveled;
 	private GameObject[] playerBody;
-	
+	private Vector3 shipVelocity = Vector3.zero;
+
+	public Vector3 ShipVelocity
+	{
+		get{return shipVelocity;}
+		set{shipVelocity = value;}
+	}
+
+	void GetShipVelocity(Vector3 velocity)
+	{
+		shipVelocity = velocity;
+	}
+
 	void Start () 
 	{
 		startPosition = transform.position;
-		rigidbody.velocity = transform.forward * Time.deltaTime * speed;
+		rigidbody.velocity = shipVelocity + (transform.forward * Time.deltaTime * speed);
 	}
 
 	void Update()
 	{
-
+		//Debug.Log(shipVelocity);
 		distanceTraveled = Vector3.Distance(transform.position, startPosition);
 
 		if (distanceTraveled >= laserDistance)
 		{
-
 			Destroy(gameObject);
-			DestroyChildren();
+			//networkView.RPC("DestroyLaser", RPCMode.All);
 		}
 	}
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (networkView.isMine)
-		{
 		//playerBody = GameObject.FindGameObjectsWithTag("Player Body");
-			if (other.tag != "Radar")
-			{
-				ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
-				//emitter.Emit();
-				Destroy(gameObject);
-				DestroyChildren();
-			}
-		}
-	}
-
-	void DestroyChildren()
-	{
-		int childs = transform.childCount;
-		
-		for (int i = childs - 1; i > 0; i--)	
+		if (other.tag != "Radar" && other.tag != "Laser")
 		{
-			GameObject.Destroy(transform.GetChild(i).gameObject);
+			ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
+			Destroy(gameObject);
 		}
 	}
 }

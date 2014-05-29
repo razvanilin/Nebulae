@@ -21,7 +21,8 @@ public class CheckAsteroidCollision : MonoBehaviour {
 
 		if (asteroidLife <= 0)
 		{
-			networkView.RPC("DestroyAsteroid", RPCMode.All);
+			networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
+			//networkView.RPC("AsteroidEffects", RPCMode.All);
 		}
 	}
 
@@ -32,5 +33,12 @@ public class CheckAsteroidCollision : MonoBehaviour {
 		AudioSource.PlayClipAtPoint(explosionClip, transform.position, 1f);
 		Destroy(asteroid);
 	}
+
+	/*[RPC]
+	void AsteroidEffects()
+	{
+		Instantiate(explosion, transform.position, transform.rotation);
+		AudioSource.PlayClipAtPoint(explosionClip, transform.position, 1f);
+	}*/
 	
 }

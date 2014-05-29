@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour {
 	public float tiltSpeed = 1f;
 	public float strafeSpeed = 1f;
 
-	public Transform laser;
+	public GameObject laser;
 	public Transform gun1;
 	public Transform gun2;
 	public float laserSpeed = 2.0f;
@@ -78,7 +78,8 @@ public class PlayerController : MonoBehaviour {
 			// Shooting lasers
 			if (Input.GetButton("Fire1") && nextFire >= fireRate)
 			{
-				networkView.RPC("LaserShot", RPCMode.All);
+				nextFire = 0f;
+				networkView.RPC("LaserShot", RPCMode.All, rigidbody.velocity);
 			}
 		}
 	}
@@ -95,11 +96,14 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	[RPC]
-	void LaserShot()
+	void LaserShot(Vector3 shipVelocity)
 	{
-		Instantiate(laser, gun1.transform.position, gun1.transform.rotation);
-		Instantiate(laser, gun2.transform.position, gun2.transform.rotation);
-		nextFire = 0f;
+
+		GameObject laser1 = Instantiate(laser, gun1.transform.position, gun1.transform.rotation) as GameObject;
+		GameObject laser2 = Instantiate(laser, gun2.transform.position, gun2.transform.rotation) as GameObject;
+		laser1.SendMessage("GetShipVelocity", rigidbody.velocity);
+		laser2.SendMessage("GetShipVelocity", rigidbody.velocity);
+
 		if (networkView.isMine)
 			AudioSource.PlayClipAtPoint(shotClip, transform.position, 0.3f);
 	}
