@@ -18,9 +18,12 @@ public class PlayerController : MonoBehaviour {
 	public AudioClip shotClip;
 
 	public float acceleration = 0f;
+	public MeshCollider playerBody;
+
 	private float nextFire = 0f;
 	private bool haltFlag;
 	private AudioListener listener;
+	private float hitdist = 10f;
 
 	void Start()
 	{
@@ -28,14 +31,25 @@ public class PlayerController : MonoBehaviour {
 		listener = GetComponent<AudioListener>();
 		if (!networkView.isMine)
 			listener.enabled = false;
+		else
+		{
+			playerBody.tag = "Main Player";
+			tag = "Main Player";
+		}
 	}
 
 	void FixedUpdate ()
 	{
 		if (networkView.isMine)
 		{
-			// Mouse Rotation
-			transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * Time.deltaTime * sensitivity);
+			//transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * Time.deltaTime * sensitivity);
+			if (Input.GetButton("Turn"))
+			{
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				Vector3 targetPoint = ray.GetPoint(hitdist);
+				Quaternion targetRotation = Quaternion.LookRotation(targetPoint - transform.position);
+				transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 1f * Time.deltaTime);
+			}
 
 			// Keyboard Inputs
 			/*float moveHorizontal = Input.GetAxis("Horizontal");
@@ -61,7 +75,6 @@ public class PlayerController : MonoBehaviour {
 				tempAcc = 0f;
 				haltFlag = true;
 			}
-
 
 			//Engine particle effect
 			networkView.RPC("MovePlayer", RPCMode.All, tempAcc);

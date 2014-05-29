@@ -21,7 +21,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.tag == "Laser")
+		if (other.tag == "Laser" && tag != "Main Player")
 		{
 			lifeLeft -= 3;
 		}

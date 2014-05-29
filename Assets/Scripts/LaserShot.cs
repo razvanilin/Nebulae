@@ -30,7 +30,7 @@ public class LaserShot : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.tag != "Radar")
+		if (other.tag != "Radar" && other.tag != "Main Player")
 		{
 			ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
 			//emitter.Emit();

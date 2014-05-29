@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TargetBoundry : MonoBehaviour {
+public class TargetBoundary : MonoBehaviour {
 	
 	public LaserShot laser;
 

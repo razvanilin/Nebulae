@@ -7,6 +7,7 @@ public class HUD : MonoBehaviour
 	public float hudTargetSize = 20f;
 	public int maximumTargets = 50;
 	public Camera cam;
+	public Texture2D targetTexture;
 
 	private Vector3 targetScreenPos;
 	private float width = 0f, height = 0f;
@@ -95,12 +96,13 @@ public class HUD : MonoBehaviour
 						{
 							if (ships[ship]) {
 								InitStyles(inRangeCol);
-								GUI.Box(new Rect(
+								if (GUI.Button(new Rect(
 									targetScreenPos.x-(hudTargetSize/2), 
 									cam.pixelHeight-targetScreenPos.y-(hudTargetSize/2), 
 									hudTargetSize, hudTargetSize),
 								        "",
-								        currentStyle);
+								        currentStyle))
+									Debug.Log("pressed!");
 							}
 						}
 					}
@@ -114,7 +116,7 @@ public class HUD : MonoBehaviour
 		if( currentStyle == null )	
 		{			
 			currentStyle = new GUIStyle( GUI.skin.box );			
-			currentStyle.normal.background = MakeTex( 2, 2, col);
+			currentStyle.normal.background = targetTexture;
 		}
 	}
 
