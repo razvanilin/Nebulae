@@ -41,6 +41,7 @@ public class GameController : MonoBehaviour {
 
 	void OnGUI()
 	{
+		GUI.depth = 0;
 		GUI.DrawTexture (new Rect(Event.current.mousePosition.x-cursorSizeX/2, Event.current.mousePosition.y-cursorSizeY/2, cursorSizeX, cursorSizeY), cursorTexture);
 	}
 

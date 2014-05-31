@@ -10,6 +10,7 @@ public class NetworkManager : MonoBehaviour {
 	public AudioClip playerConnectedClip;
 	public AudioClip playerDisconnectedClip;
 	public string playerName = "Pilot";
+	public GUISkin guiSkin;
 
 	private const string typeName = "Nebulae_V0.0.1_TestServer";
 	private const string gameName = "Nebulae Space";
@@ -70,6 +71,7 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnGUI()
 	{
+		GUI.skin = guiSkin;
 		if (!Network.isClient && !Network.isServer)
 		{
 			playerName = GUI.TextField(new Rect(100, 50, 300, 25), playerName, 25);
@@ -77,7 +79,7 @@ public class NetworkManager : MonoBehaviour {
 			{
 				StartServer();
 			}
-			if (GUI.Button(new Rect(100, 250, 250, 100), "Refresh Hosts"))
+			if (GUI.Button(new Rect(100, 200, 250, 100), "Refresh Hosts"))
 				RefreshHostList();
 			
 			if (hostList != null)
