@@ -8,7 +8,8 @@ public class LifeRemaining : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		//guiText.text = player.LifeLeft + "%";
+		if (networkView.isMine)
+			guiText.text = player.LifeLeft + "%";
 	}
 	
 }

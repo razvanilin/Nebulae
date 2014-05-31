@@ -18,9 +18,12 @@ public class NetworkManager : MonoBehaviour {
 	private Dictionary<NetworkPlayer, string> playerList = new Dictionary<NetworkPlayer, string>();
 	private float playerTimeDisplay = 5f;
 	private float timePassed = 0f;
+	private State gameState;
 
 	void Start()
 	{
+		MasterServer.ipAddress = "188.226.229.203";
+		gameState = State.GetInstance();
 		sceneFadeIn = GameObject.FindGameObjectWithTag("Fader").GetComponent<SceneFadeInOut>();
 	}
 
@@ -28,7 +31,7 @@ public class NetworkManager : MonoBehaviour {
 	{
 		sceneFadeIn.EndScene();
 		Debug.Log("Server Initializied");
-		Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
+		//Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
 		StartCoroutine(CRoutine());
 		//SpawnPlayer();
 	}
@@ -69,7 +72,7 @@ public class NetworkManager : MonoBehaviour {
 	{
 		if (!Network.isClient && !Network.isServer)
 		{
-			playerName = GUI.TextField(new Rect(100, 400, 300, 25), playerName, 25);
+			playerName = GUI.TextField(new Rect(100, 50, 300, 25), playerName, 25);
 			if (GUI.Button(new Rect(100, 100, 250, 100), "Start Server"))
 			{
 				StartServer();
@@ -131,6 +134,7 @@ public class NetworkManager : MonoBehaviour {
 
 	private void SpawnPlayer()
 	{
+		gameState.GState = State.GameState.PLAY;
 		Network.Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
 		Destroy(introObject);
 	}

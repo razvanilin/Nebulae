@@ -53,7 +53,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 
 	void OnGUI()
 	{
-		if (networkView.isMine)
-			GUI.TextArea(new Rect(Screen.width-50, Screen.height-70, 50, 50), lifeLeft + "%");
+		//if (networkView.isMine)
+			//GUI.TextArea(new Rect(Screen.width-50, Screen.height-70, 50, 50), lifeLeft + "%");
 	}
 }
