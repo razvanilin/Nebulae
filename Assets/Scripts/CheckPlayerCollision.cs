@@ -23,11 +23,11 @@ public class CheckPlayerCollision : MonoBehaviour {
 	{
 		if (other.tag == "Laser" && tag != "Main Player")
 		{
-			lifeLeft -= 3;
+			networkView.RPC("InflictDamage", RPCMode.All, 3);
 		}
 		if (other.tag ==  "Asteroid")
 		{
-			lifeLeft -= 20;
+			networkView.RPC("InflictDamage", RPCMode.All, 20);
 			if (!audioSource.isPlaying)
 				audioSource.Play();
 		}
@@ -37,6 +37,13 @@ public class CheckPlayerCollision : MonoBehaviour {
 		}
 
 	}
+
+	[RPC]
+	void InflictDamage(int damage)
+	{
+		lifeLeft -= damage;
+	}
+
 
 	[RPC]
 	void DestroyPlayer()

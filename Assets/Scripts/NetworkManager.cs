@@ -11,15 +11,16 @@ public class NetworkManager : MonoBehaviour {
 	public AudioClip playerDisconnectedClip;
 	public string playerName = "Pilot";
 	public GUISkin guiSkin;
+	public Player playerObj;
 
 	private const string typeName = "Nebulae_V0.0.1_TestServer";
 	private const string gameName = "Nebulae Space";
 	private HostData[] hostList;
 	private SceneFadeInOut sceneFadeIn;
-	private Dictionary<NetworkPlayer, string> playerList = new Dictionary<NetworkPlayer, string>();
 	private float playerTimeDisplay = 5f;
 	private float timePassed = 0f;
 	private State gameState;
+	private List<Player> playerList = new List<Player>();
 
 	void Start()
 	{
@@ -33,8 +34,8 @@ public class NetworkManager : MonoBehaviour {
 		sceneFadeIn.EndScene();
 		Debug.Log("Server Initializied");
 		//Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
-		StartCoroutine(CRoutine());
-		//SpawnPlayer();
+		//StartCoroutine(CRoutine());
+		SpawnPlayer();
 	}
 
 	void OnMasterServerEvent(MasterServerEvent msEvent)
@@ -47,18 +48,23 @@ public class NetworkManager : MonoBehaviour {
 	{
 		sceneFadeIn.EndScene();
 		Debug.Log("Server Joined");
-		StartCoroutine(CRoutine());
+		SpawnPlayer();
+		//StartCoroutine(CRoutine());
 	}
 
 	void OnPlayerConnected(NetworkPlayer playerConnection)
 	{
-		playerList.Add(playerConnection, playerName);
 		AudioSource.PlayClipAtPoint(playerConnectedClip, Vector3.zero, 1f);
+		AddPlayerToList();
+
+		foreach(Player P in playerList)
+		{
+			P.SetName(playerConnection);
+		}
 	}
 
 	void OnPlayerDisconnected(NetworkPlayer playerConnection)
 	{
-		playerList.Remove(playerConnection);
 		AudioSource.PlayClipAtPoint(playerDisconnectedClip, Vector3.zero, 1f);
 		Network.RemoveRPCs(playerConnection);
 		Network.DestroyPlayerObjects(playerConnection);
@@ -94,15 +100,22 @@ public class NetworkManager : MonoBehaviour {
 
 		if (Input.GetButton("Score Window"))
 		{
-			if (playerList != null)
+			for (int i=0; i<playerList.Count; i++)
 			{
-				int i = 0;
-				foreach(NetworkPlayer pilot in playerList.Keys)
-				{
-					Debug.Log(playerList[pilot]);
-					GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerList[pilot]);
-					i++;
-				}
+				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerList[i].Name);
+			}
+		}
+	}
+
+	void AddPlayerToList()
+	{
+		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+		for (int i = 0; i<players.Length; i++)
+		{
+			for (int j = 0; j<playerList.Count; j++)
+			{
+				if (players[i].GetComponent<Player>() != playerList[j])
+					playerList.Add(players[i].GetComponent<Player>());
 			}
 		}
 	}
