@@ -99,13 +99,13 @@ public class NetworkManager : MonoBehaviour {
 			}
 		}
 
-		if (Input.GetButton("Score Window"))
+		/*if (Input.GetButton("Score Window"))
 		{
 			for (int i=0; i<playerList.Count; i++)
 			{
 				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerList[i].Name);
 			}
-		}
+		}*/
 	}
 
 	void AddPlayerToList()

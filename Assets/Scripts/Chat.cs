@@ -46,7 +46,7 @@ public class Chat : MonoBehaviour
 	{
 		ShowChatWindow();
 		networkView.RPC("TellServerOurName", RPCMode.Server, playerName);
-		AddGameChatMessage(playerName + " has just joined the game!");
+		//AddGameChatMessage(playerName + " has just joined the nebula!");
 	}
 
 	void OnServerInitialized()
@@ -56,7 +56,7 @@ public class Chat : MonoBehaviour
 		newEntry.playerName = playerName;
 		newEntry.player = Network.player;
 		playerList.Add(newEntry);
-		AddGameChatMessage(playerName + " has just joined the game!");
+		AddGameChatMessage(playerName + " has just joined the nebula!");
 	}
 
 	PlayerNode GetPlayerNode(NetworkPlayer netPlay)
@@ -74,7 +74,7 @@ public class Chat : MonoBehaviour
 
 	void OnPlayerDisconnected(NetworkPlayer netPlayer)
 	{
-		AddGameChatMessage("A player has disconnected");
+		AddGameChatMessage("A player has disconnected from the nebula");
 		playerList.Remove(netPlayer);
 	}
 
@@ -90,8 +90,7 @@ public class Chat : MonoBehaviour
 		newEntry.playerName = playerName;
 		newEntry.player = Network.player;
 		playerList.Add(newEntry);
-		//CRoutine();
-		AddGameChatMessage(name + " has just joined the game!");
+		AddGameChatMessage(name + " has just joined the nebula!");
 	}
 
 	void CloseChatWindow()
@@ -125,6 +124,15 @@ public class Chat : MonoBehaviour
 				usingChat = true;
 				GUI.FocusWindow(5);
 				GUI.FocusControl("Chat input field");
+			}
+		}
+
+		if (Input.GetButton("Score Window"))
+		{
+			for (int i=0; i<playerList.Count; i++)
+			{
+				PlayerNode playerNode = playerList[i] as PlayerNode;
+				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerNode.playerName);
 			}
 		}
 
@@ -208,7 +216,7 @@ public class Chat : MonoBehaviour
 	{
 		ApplyGlobalChatText(" - ", str);
 		if (Network.connections.Length > 0)
-			networkView.RPC ("ApplyGLobalChatText", RPCMode.Others, " - ", str);
+			networkView.RPC ("ApplyGlobalChatText", RPCMode.Others, " - ", str);
 	}
 
 	// Update is called once per frame
