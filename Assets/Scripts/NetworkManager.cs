@@ -77,10 +77,11 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnGUI()
 	{
+
 		GUI.skin = guiSkin;
+
 		if (!Network.isClient && !Network.isServer)
 		{
-			playerName = GUI.TextField(new Rect(100, 50, 300, 25), playerName, 25);
 			if (GUI.Button(new Rect(100, 100, 250, 100), "Start Server"))
 			{
 				StartServer();
