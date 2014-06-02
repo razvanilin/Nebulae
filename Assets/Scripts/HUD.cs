@@ -97,7 +97,7 @@ public class HUD : MonoBehaviour
 					{
 						//Debug.Log(ships[ship]);
 						targetScreenPos = cam.WorldToScreenPoint(ship.transform.position);
-						float realShotSpeed = Vector3.Magnitude(laser.rigidbody.velocity + player.rigidbody.velocity);
+						float realShotSpeed = Vector3.Magnitude((laser.rigidbody.velocity + player.rigidbody.velocity)* shotSpeed * Time.deltaTime);
 
 						interceptScreenPos = cam.WorldToScreenPoint(
 							FirstOrderIntercept(
