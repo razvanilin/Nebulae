@@ -8,6 +8,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 	public AudioClip explosionClip;
 	public GameObject player;
 	public PlayerController playerContr;
+	public ScoreWindow scoreWindow;
 
 	private AudioSource audioSource;
 	private int lifeLeft;
@@ -21,19 +22,25 @@ public class CheckPlayerCollision : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.tag == "Laser" && tag != "Main Player")
+		if (networkView.isMine)
 		{
-			networkView.RPC("InflictDamage", RPCMode.All, 3);
-		}
-		if (other.tag ==  "Asteroid")
-		{
-			networkView.RPC("InflictDamage", RPCMode.All, 20);
-			if (!audioSource.isPlaying)
-				audioSource.Play();
-		}
-		if (lifeLeft <= 0)
-		{
-			networkView.RPC("DestroyPlayer", RPCMode.AllBuffered);
+			if (other.tag == "Laser")
+			{
+				networkView.RPC("InflictDamage", RPCMode.All, 3);
+			}
+			if (other.tag ==  "Asteroid")
+			{
+				networkView.RPC("InflictDamage", RPCMode.All, 20);
+				if (!audioSource.isPlaying)
+					audioSource.Play();
+			}
+			if (lifeLeft <= 0)
+			{
+				networkView.RPC("DestroyPlayer", RPCMode.AllBuffered);
+				NetworkViewID netView = networkView.viewID;
+				Debug.Log(netView.owner.ipAddress);
+				scoreWindow.AddPoint(netView.owner);
+			}
 		}
 
 	}

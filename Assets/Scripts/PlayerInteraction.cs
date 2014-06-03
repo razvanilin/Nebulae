@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Chat : MonoBehaviour 
+public class PlayerInteraction : MonoBehaviour 
 {
 	public GUISkin guiSkin;
 	public float chatX;
 	public float chatY;
 	public int width = 400;
 	public int height = 200;
+	public ScoreWindow scoreWindow;
 
 	private bool usingChat = false;
 	private bool showChat = false;
@@ -46,20 +47,22 @@ public class Chat : MonoBehaviour
 	{
 		ShowChatWindow();
 		networkView.RPC("TellServerOurName", RPCMode.Server, playerName);
+		networkView.RPC ("AddPlayerToList", RPCMode.AllBuffered, playerName);
 		//AddGameChatMessage(playerName + " has just joined the nebula!");
 	}
 
 	void OnServerInitialized()
 	{
 		ShowChatWindow();
-		PlayerNode newEntry = new PlayerNode();
+		/*PlayerNode newEntry = new PlayerNode();
 		newEntry.playerName = playerName;
 		newEntry.player = Network.player;
-		playerList.Add(newEntry);
+		playerList.Add(newEntry);*/
+		networkView.RPC("AddPlayerToList", RPCMode.AllBuffered, playerName);
 		AddGameChatMessage(playerName + " has just joined the nebula!");
 	}
 
-	PlayerNode GetPlayerNode(NetworkPlayer netPlay)
+	/*PlayerNode GetPlayerNode(NetworkPlayer netPlay)
 	{
 		foreach(PlayerNode entry in playerList)
 		{
@@ -70,12 +73,13 @@ public class Chat : MonoBehaviour
 		}
 		Debug.LogError("GetPlayerNode: Requested a playernode of non-existing player.");
 		return null;
-	}
+	}*/
 
 	void OnPlayerDisconnected(NetworkPlayer netPlayer)
 	{
 		AddGameChatMessage("A player has disconnected from the nebula");
-		playerList.Remove(netPlayer);
+		scoreWindow.RemovePlayer(netPlayer);
+		//playerList.Remove(netPlayer);
 	}
 
 	void OnDisconnectedFromServer()
@@ -84,10 +88,19 @@ public class Chat : MonoBehaviour
 	}
 
 	[RPC]
+	void AddPlayerToList(string name)
+	{
+		Player newEntry = new Player();
+		newEntry.Name = name;
+		newEntry.PlayerID = Network.player;
+		scoreWindow.AddPlayer(newEntry);
+	}
+
+	[RPC]
 	void TellServerOurName(string name, NetworkMessageInfo info)
 	{
 		PlayerNode newEntry = new PlayerNode();
-		newEntry.playerName = playerName;
+		newEntry.playerName = name;
 		newEntry.player = Network.player;
 		playerList.Add(newEntry);
 		AddGameChatMessage(name + " has just joined the nebula!");
@@ -127,14 +140,14 @@ public class Chat : MonoBehaviour
 			}
 		}
 
-		if (Input.GetButton("Score Window"))
+		/*if (Input.GetButton("Score Window"))
 		{
 			for (int i=0; i<playerList.Count; i++)
 			{
 				PlayerNode playerNode = playerList[i] as PlayerNode;
 				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerNode.playerName);
 			}
-		}
+		}*/
 
 		window = GUI.Window(5, window, GlobalChatWindow, "");
 	}

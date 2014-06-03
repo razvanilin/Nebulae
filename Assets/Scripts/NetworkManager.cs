@@ -11,7 +11,6 @@ public class NetworkManager : MonoBehaviour {
 	public AudioClip playerDisconnectedClip;
 	public string playerName = "Pilot";
 	public GUISkin guiSkin;
-	public Player playerObj;
 
 	private const string typeName = "Nebulae_V0.0.1_TestServer";
 	private const string gameName = "Nebulae Space";
@@ -55,12 +54,6 @@ public class NetworkManager : MonoBehaviour {
 	void OnPlayerConnected(NetworkPlayer playerConnection)
 	{
 		AudioSource.PlayClipAtPoint(playerConnectedClip, Vector3.zero, 1f);
-		AddPlayerToList();
-
-		foreach(Player P in playerList)
-		{
-			P.SetName(playerConnection);
-		}
 	}
 
 	void OnPlayerDisconnected(NetworkPlayer playerConnection)
@@ -106,19 +99,6 @@ public class NetworkManager : MonoBehaviour {
 				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerList[i].Name);
 			}
 		}*/
-	}
-
-	void AddPlayerToList()
-	{
-		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-		for (int i = 0; i<players.Length; i++)
-		{
-			for (int j = 0; j<playerList.Count; j++)
-			{
-				if (players[i].GetComponent<Player>() != playerList[j])
-					playerList.Add(players[i].GetComponent<Player>());
-			}
-		}
 	}
 
 	private void StartServer()

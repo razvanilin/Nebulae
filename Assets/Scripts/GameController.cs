@@ -37,24 +37,6 @@ public class GameController : MonoBehaviour {
 			break;
 		case State.GameState.PLAY:
 			tempTime += Time.deltaTime;
-			/*if (Input.GetButton("Tooltip") && tooltip.networkView.isMine && tempTime >= delayTime)
-			{
-				Debug.Log(1);
-				if (hideTooltip)
-				{
-					Debug.Log(2);
-					tooltip.SetActive(true);
-					hideTooltip = false;
-				}
-				else
-				{
-					Debug.Log(3);
-					tooltip.SetActive(false);
-					hideTooltip = true;
-				}
-				tempTime = 0f;
-			}*/
-
 			FadeMusic();
 			break;
 		default:
