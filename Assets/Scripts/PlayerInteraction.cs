@@ -40,7 +40,7 @@ public class PlayerInteraction : MonoBehaviour
 		window = new Rect(10, Screen.height - height+5, width, height);
 		playerName = PlayerPrefs.GetString("playerName", "");
 
-		if (playerName == "") playerName = "Pilot" + Random.Range(1, 999);
+		if (playerName == "") playerName = "Pilot_Name_" + Random.Range(1, 999);
 	}
 
 	void OnConnectedToServer()
@@ -61,19 +61,6 @@ public class PlayerInteraction : MonoBehaviour
 		networkView.RPC("AddPlayerToList", RPCMode.AllBuffered, playerName);
 		AddGameChatMessage(playerName + " has just joined the nebula!");
 	}
-
-	/*PlayerNode GetPlayerNode(NetworkPlayer netPlay)
-	{
-		foreach(PlayerNode entry in playerList)
-		{
-			if (entry.player == netPlay)
-			{
-				return entry;
-			}
-		}
-		Debug.LogError("GetPlayerNode: Requested a playernode of non-existing player.");
-		return null;
-	}*/
 
 	void OnPlayerDisconnected(NetworkPlayer netPlayer)
 	{
@@ -125,7 +112,7 @@ public class PlayerInteraction : MonoBehaviour
 		GUI.skin = guiSkin;
 		if (State.GetInstance().GState == State.GameState.MENU)
 		{
-			playerName = GUI.TextField(new Rect(100, 50, 300, 25), playerName, 25);
+			playerName = GUI.TextField(new Rect(100, 150, 300, 25), playerName, 25);
 		}
 
 		if (!showChat) return;

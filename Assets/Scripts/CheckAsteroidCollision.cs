@@ -3,10 +3,15 @@ using System.Collections;
 
 public class CheckAsteroidCollision : MonoBehaviour {
 
-	public int asteroidLife = 3;
+	public float asteroidLife = 3;
 	public Transform explosion;
 	public GameObject asteroid;
 	public AudioClip explosionClip;
+
+	void Start()
+	{
+		asteroidLife *= transform.localScale.x;
+	}
 	
 	void OnTriggerEnter(Collider other)
 	{

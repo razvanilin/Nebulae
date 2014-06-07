@@ -66,13 +66,11 @@ public class ScoreWindow : MonoBehaviour {
 
 	public void AddPoint(NetworkPlayer player)
 	{
-		Debug.Log ("Add point accessed");
-		networkView.RPC("Death", RPCMode.AllBuffered, player);
-	}
+		Debug.Log ("Add point accessed - " + playerList.Count);
 
-	[RPC]
-	void Death(NetworkPlayer player)
-	{
+		if (playerList == null)
+			Debug.Log("List is null");
+
 		for (int i=0; i<playerList.Count; i++)
 		{
 			Debug.Log("here!" + i);
@@ -84,5 +82,5 @@ public class ScoreWindow : MonoBehaviour {
 				break;
 			}
 		}
-	}
+	}	
 }

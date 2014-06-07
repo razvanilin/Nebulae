@@ -21,16 +21,18 @@ public class HUD : MonoBehaviour
 
 	private float shotSpeed;
 	private Transform player;
-
 	void Start()
 	{
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		for (int i=0; i<players.Length; i++)
 		{
 			if (players[i].networkView.isMine)
+			{
 				player = players[i].transform;
+				break;
+			}
 		}
-		shotSpeed = laser.GetComponent<LaserShot>().speed;
+		shotSpeed = laser.GetComponent<LaserShot>().speed * Time.deltaTime;
 		ships = new Dictionary<GameObject, bool>();
 	}
 
@@ -83,6 +85,7 @@ public class HUD : MonoBehaviour
 		}
 	}
 
+	bool isActive = false;
 	void OnGUI()
 	{
 		if (networkView.isMine)
@@ -95,15 +98,13 @@ public class HUD : MonoBehaviour
 				{
 					if (ship != null)
 					{
-						//Debug.Log(ships[ship]);
 						targetScreenPos = cam.WorldToScreenPoint(ship.transform.position);
-						float realShotSpeed = Vector3.Magnitude((laser.rigidbody.velocity + player.rigidbody.velocity)* shotSpeed * Time.deltaTime);
 
 						interceptScreenPos = cam.WorldToScreenPoint(
 							FirstOrderIntercept(
 							player.position,
 							player.rigidbody.velocity,
-							realShotSpeed,
+							shotSpeed,
 							ship.transform.position,
 							ship.rigidbody.velocity)
 							);
@@ -115,17 +116,26 @@ public class HUD : MonoBehaviour
 						{
 							height = targetScreenPos.y;
 						}
-
-						if (targetScreenPos.z >= 0)
+						if (targetScreenPos.z < 0)
+						{
+							width = (targetScreenPos.x < cam.pixelWidth/2) ? 0.1f : cam.pixelWidth - 0.1f;
+						}
+						/*if (targetScreenPos.y <= cam.pixelWidth && targetScreenPos.y >= 0 && targetScreenPos.z < 0)
+						{
+							height = (targetScreenPos.y < cam.pixelHeight/2) ? 0.1f : cam.pixelHeight + 0.1f;
+						}*/
+						if (/*targetScreenPos.z >= 0*/ true)
 						{
 							if (ships[ship]) {
 								InitStyles(inRangeCol);
-								if (GUI.Button(new Rect(
-									targetScreenPos.x-(hudTargetSize/2), 
-									cam.pixelHeight-targetScreenPos.y-(hudTargetSize/2), 
-									hudTargetSize, hudTargetSize),
-								        ""))
-									Debug.Log("pressed!");
+								if (GUI.Button(
+									new Rect(
+										width-(hudTargetSize/2), cam.pixelHeight - height - (hudTargetSize/2), 
+										hudTargetSize, hudTargetSize
+										),
+									""))
+									isActive = false;
+
 
 								GUI.Box(new Rect(
 									interceptScreenPos.x-(hudTargetSize/4), 
