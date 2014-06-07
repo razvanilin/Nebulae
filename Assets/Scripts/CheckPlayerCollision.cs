@@ -31,7 +31,10 @@ public class CheckPlayerCollision : MonoBehaviour {
 			{
 				tempTime += Time.deltaTime;
 				if (tempTime >= immunityTime)
+				{
 					isImmune = false;
+					tempTime = 0f;
+				}
 			}
 		}
 	}
@@ -42,19 +45,16 @@ public class CheckPlayerCollision : MonoBehaviour {
 		{
 			if (other.tag == "Laser" && !isImmune)
 			{
-				Debug.Log(isImmune + " - laser");
 				networkView.RPC("InflictDamage", RPCMode.All, 3);
 			}
 			if (other.tag == "Asteroid" && !isImmune)
 			{
 				networkView.RPC("InflictDamage", RPCMode.All, 20);
-				Debug.Log(isImmune + " - asteroid");
 				if (!audioSource.isPlaying)
 					audioSource.Play();
 			}
 			if (lifeLeft <= 0)
 			{
-				//Debug.Log(isImmune + " - lifeLeft");
 				networkView.RPC("DestroyPlayer", RPCMode.AllBuffered);
 			}
 		}
