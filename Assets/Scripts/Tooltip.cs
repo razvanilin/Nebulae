@@ -3,21 +3,13 @@ using System.Collections;
 
 public class Tooltip : MonoBehaviour {
 
+	private float sensitivity = 1f;
+	private float tempTime = 0f;
 	private bool hideTooltipAtStart = false;
 	private bool hideTooltip = true;
 
 	void Start()
 	{
-
-	}
-
-	// Update is called once per frame
-	void Update () 
-	{
-		/*if (State.GetInstance().GState == State.GameState.PLAY && !hideTooltipAtStart)
-		{
-			gameObject.SetActive(false);
-			hideTooltip = true;
-		}*/
+		gameObject.SetActive(false);
 	}
 }

@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour {
 	private bool musicIsFading;
 	private bool hideTooltip = true;
 	private GameObject tooltip;
-	private float tooltipDelay;
+	private float tooltipDelay = 1f;
 	// Use this for initialization
 	void Start () 
 	{
@@ -36,6 +36,13 @@ public class GameController : MonoBehaviour {
 		case State.GameState.MENU:
 			break;
 		case State.GameState.PLAY:
+			tempTime+=Time.deltaTime;
+			if (Input.GetButton("Tooltip") && tempTime>tooltipDelay)
+			{
+				Debug.Log("Tooltip");
+				tooltip.SetActive(!tooltip.activeInHierarchy);
+				tempTime = 0f;
+			}
 			tempTime += Time.deltaTime;
 			FadeMusic();
 			break;

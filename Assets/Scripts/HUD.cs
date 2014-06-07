@@ -136,12 +136,12 @@ public class HUD : MonoBehaviour
 									""))
 									isActive = false;
 
-
-								GUI.Box(new Rect(
-									interceptScreenPos.x-(hudTargetSize/4), 
-									cam.pixelHeight-interceptScreenPos.y-(hudTargetSize/4), 
-									hudTargetSize/2, hudTargetSize/2),
-								           "");
+								if (targetScreenPos.z >= 0)
+									GUI.Box(new Rect(
+										interceptScreenPos.x-(hudTargetSize/4), 
+										cam.pixelHeight-interceptScreenPos.y-(hudTargetSize/4), 
+										hudTargetSize/2, hudTargetSize/2),
+									           "");
 							}
 						}
 					}

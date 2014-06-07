@@ -12,7 +12,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 	public ScoreWindow scoreWindow;
 
 	private float tempTime = 0f;
-	private bool isImmune = true;
+	private bool isImmune = false;
 	private AudioSource audioSource;
 	private int lifeLeft;
 	public int LifeLeft {get{return lifeLeft;}}
@@ -29,9 +29,14 @@ public class CheckPlayerCollision : MonoBehaviour {
 		{
 			if (isImmune)
 			{
+				player.rigidbody.velocity = new Vector3(0,0,0);
+				player.rigidbody.angularVelocity = new Vector3(0,0,0);
+				player.rigidbody.isKinematic = true;
+				playerContr.Acceleration = 0f;
 				tempTime += Time.deltaTime;
 				if (tempTime >= immunityTime)
 				{
+					networkView.RPC("ResetPlayer", RPCMode.All);
 					isImmune = false;
 					tempTime = 0f;
 				}
@@ -65,6 +70,8 @@ public class CheckPlayerCollision : MonoBehaviour {
 	void InflictDamage(int damage)
 	{
 		lifeLeft -= damage;
+		if (lifeLeft < 0)
+			lifeLeft = 0;
 	}
 
 
@@ -73,16 +80,26 @@ public class CheckPlayerCollision : MonoBehaviour {
 	{
 		AudioSource.PlayClipAtPoint(explosionClip, transform.position);
 		Instantiate(explosionEffect, transform.position, transform.rotation);
-		player.transform.position = new Vector3(0,0,0);
+		/*player.transform.position = new Vector3(0,0,0);
 		player.rigidbody.velocity = new Vector3(0,0,0);
 		player.rigidbody.angularVelocity = new Vector3(0,0,0);
 		player.transform.rotation = Quaternion.identity;
-		playerContr.Acceleration = 0f;
+		playerContr.Acceleration = 0f;*/
+		player.renderer.enabled = false;
 		lifeLeft = playerLife;
 		NetworkViewID netView = networkView.viewID;
 		Debug.Log(netView.owner.ipAddress);
 		scoreWindow.AddPoint(netView.owner);
 		
 		isImmune = true;
+	}
+
+	[RPC]
+	void ResetPlayer()
+	{
+		player.transform.position = new Vector3(0,0,0);
+		player.transform.rotation = Quaternion.identity;
+		player.renderer.enabled = true;
+		player.rigidbody.isKinematic = false;
 	}
 }

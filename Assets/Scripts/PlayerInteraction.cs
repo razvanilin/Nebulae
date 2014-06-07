@@ -146,6 +146,9 @@ public class PlayerInteraction : MonoBehaviour
 		GUILayout.EndVertical();
 
 		scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+		GUILayout.BeginHorizontal();
+		GUILayout.Label("Press 'H' to show/hide flight instructions.");
+		GUILayout.EndHorizontal();
 
 		foreach(ChatEntry entry in chatEntries)
 		{
