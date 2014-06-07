@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour {
 	public int cursorSizeX = 20;
 	public int cursorSizeY = 20;
 	public float musicFadeSpeed = 0.5f;
+	public GUISkin guiSkin;
 	
 	//public AudioClip backgroundMusic;
 	private float delayTime = 0.5f;
@@ -17,7 +18,8 @@ public class GameController : MonoBehaviour {
 	private bool musicIsFading;
 	private bool hideTooltip = true;
 	private GameObject tooltip;
-	private float tooltipDelay = 1f;
+	private float tooltipDelay = 0.5f;
+	private bool showMenu = false;
 	// Use this for initialization
 	void Start () 
 	{
@@ -43,7 +45,11 @@ public class GameController : MonoBehaviour {
 				tooltip.SetActive(!tooltip.activeInHierarchy);
 				tempTime = 0f;
 			}
-			tempTime += Time.deltaTime;
+			if (Input.GetButton("Sub-Menu") && tempTime>=tooltipDelay)
+			{
+				showMenu = !showMenu;
+				tempTime = 0f;
+			}
 			FadeMusic();
 			break;
 		default:
@@ -53,8 +59,23 @@ public class GameController : MonoBehaviour {
 
 	void OnGUI()
 	{
+		GUI.skin = guiSkin;
 		GUI.depth = 0;
 		GUI.DrawTexture (new Rect(Event.current.mousePosition.x-cursorSizeX/2, Event.current.mousePosition.y-cursorSizeY/2, cursorSizeX, cursorSizeY), cursorTexture);
+		if (showMenu)
+		{
+			if (GUI.Button(new Rect(Screen.width/2 - 100, Screen.height/2 - 50, 200, 100), "Exit"))
+				Application.Quit();
+			if (GUI.Button(new Rect(Screen.width/2 - 100, Screen.height/2 - 150, 200, 100), "Leave the Nebula"))
+			{
+				Network.Disconnect();
+				showMenu = false;
+				State.GetInstance().GState = State.GameState.MENU;
+				Application.LoadLevel(0);
+			}
+			if (GUI.Button(new Rect(Screen.width/2 - 100, Screen.height/2 - 250, 200, 100), "Resume"))
+				showMenu = false;
+		}
 	}
 
 	void FadeMusic()

@@ -75,13 +75,17 @@ public class NetworkManager : MonoBehaviour {
 
 		if (!Network.isClient && !Network.isServer)
 		{
-			if (GUI.Button(new Rect(100, 200, 250, 100), "Start Server"))
+			if (GUI.Button(new Rect(100, 200, 250, 100), "Create a Nebula"))
 			{
 				StartServer();
 			}
-			if (GUI.Button(new Rect(100, 300, 250, 100), "Refresh Hosts"))
+			if (GUI.Button(new Rect(100, 300, 250, 100), "Look for Nebulae"))
 				RefreshHostList();
-			
+			if (GUI.Button(new Rect(100, 400, 250, 100), "Exit the Nebula"))
+			{
+				sceneFadeIn.EndScene();
+				Application.Quit();
+			}
 			if (hostList != null)
 			{
 				for (int i = 0; i < hostList.Length; i++)
@@ -104,6 +108,11 @@ public class NetworkManager : MonoBehaviour {
 
 	private void JoinServer(HostData hostData)
 	{
+		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+		for (int i = 0; i<players.Length; i++)
+		{
+			Destroy(players[i]);
+		}
 		Network.Connect(hostData);
 	}
 

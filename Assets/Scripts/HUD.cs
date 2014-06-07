@@ -18,9 +18,9 @@ public class HUD : MonoBehaviour
 	private Dictionary<GameObject, bool> ships;
 	private Color inRangeCol = new Color(0f, 1f, 0f, 0.5f);
 	private Color outRangeCol = new Color(1f, 0f, 0f, 0.5f);
-
-	private float shotSpeed;
+	
 	private Transform player;
+
 	void Start()
 	{
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -32,21 +32,7 @@ public class HUD : MonoBehaviour
 				break;
 			}
 		}
-		shotSpeed = laser.GetComponent<LaserShot>().speed * Time.deltaTime;
 		ships = new Dictionary<GameObject, bool>();
-	}
-
-	void Update () 
-	{
-/*		Dictionary<GameObject, bool> removeList = ships;
-
-		foreach(GameObject ship in removeList.Keys)
-		{
-			if (ship == null)
-			{
-				ships.Remove(ship);
-			}
-		}*/
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -76,7 +62,7 @@ public class HUD : MonoBehaviour
 
 	void OnTriggerExit (Collider other)
 	{
-		if (networkView.isMine && other.tag == "Player")
+		if (other.tag == "Player")
 		{
 			if (ships.ContainsKey(other.gameObject))
 			{
@@ -96,18 +82,10 @@ public class HUD : MonoBehaviour
 			{
 				foreach(GameObject ship in ships.Keys)
 				{
-					if (ship != null)
+					if (ship != null && ships[ship])
 					{
 						targetScreenPos = cam.WorldToScreenPoint(ship.transform.position);
 
-						interceptScreenPos = cam.WorldToScreenPoint(
-							FirstOrderIntercept(
-							player.position,
-							player.rigidbody.velocity,
-							shotSpeed,
-							ship.transform.position,
-							ship.rigidbody.velocity)
-							);
 						if (targetScreenPos.x <= cam.pixelWidth && targetScreenPos.x >= 0)
 						{
 							width = targetScreenPos.x;
@@ -120,123 +98,20 @@ public class HUD : MonoBehaviour
 						{
 							width = (targetScreenPos.x < cam.pixelWidth/2) ? 0.1f : cam.pixelWidth - 0.1f;
 						}
-						/*if (targetScreenPos.y <= cam.pixelWidth && targetScreenPos.y >= 0 && targetScreenPos.z < 0)
-						{
-							height = (targetScreenPos.y < cam.pixelHeight/2) ? 0.1f : cam.pixelHeight + 0.1f;
-						}*/
-						if (/*targetScreenPos.z >= 0*/ true)
-						{
-							if (ships[ship]) {
-								InitStyles(inRangeCol);
-								if (GUI.Button(
-									new Rect(
-										width-(hudTargetSize/2), cam.pixelHeight - height - (hudTargetSize/2), 
-										hudTargetSize, hudTargetSize
-										),
-									""))
-									isActive = false;
+						if (ships[ship]) {
+							if (GUI.Button(
+								new Rect(
+									width-(hudTargetSize/2), cam.pixelHeight - height - (hudTargetSize/2), 
+									hudTargetSize, hudTargetSize
+									),
+								""))
+								isActive = false;
 
-								if (targetScreenPos.z >= 0)
-									GUI.Box(new Rect(
-										interceptScreenPos.x-(hudTargetSize/4), 
-										cam.pixelHeight-interceptScreenPos.y-(hudTargetSize/4), 
-										hudTargetSize/2, hudTargetSize/2),
-									           "");
-							}
+
 						}
 					}
 				}
 			}
 		}
-	}
-
-	//first-order intercept using absolute target position
-	public static Vector3 FirstOrderIntercept
-		(
-			Vector3 shooterPosition,
-			Vector3 shooterVelocity,
-			float shotSpeed,
-			Vector3 targetPosition,
-			Vector3 targetVelocity
-		)  {
-		Vector3 targetRelativePosition = targetPosition - shooterPosition;
-		Vector3 targetRelativeVelocity = targetVelocity - shooterVelocity;
-		float t = FirstOrderInterceptTime
-			(
-				shotSpeed,
-				targetRelativePosition,
-				targetRelativeVelocity
-				);
-		return targetPosition + t*(targetRelativeVelocity);
-	}
-	//first-order intercept using relative target position
-	public static float FirstOrderInterceptTime
-		(
-			float shotSpeed,
-			Vector3 targetRelativePosition,
-			Vector3 targetRelativeVelocity
-		) {
-		float velocitySquared = targetRelativeVelocity.sqrMagnitude;
-		if(velocitySquared < 0.001f)
-			return 0f;
-		
-		float a = velocitySquared - shotSpeed*shotSpeed;
-		
-		//handle similar velocities
-		if (Mathf.Abs(a) < 0.001f)
-		{
-			float t = -targetRelativePosition.sqrMagnitude/
-				(
-					2f*Vector3.Dot
-					(
-					targetRelativeVelocity,
-					targetRelativePosition
-					)
-					);
-			return Mathf.Max(t, 0f); //don't shoot back in time
-		}
-		
-		float b = 2f*Vector3.Dot(targetRelativeVelocity, targetRelativePosition);
-		float c = targetRelativePosition.sqrMagnitude;
-		float determinant = b*b - 4f*a*c;
-		
-		if (determinant > 0f) { //determinant > 0; two intercept paths (most common)
-			float	t1 = (-b + Mathf.Sqrt(determinant))/(2f*a),
-			t2 = (-b - Mathf.Sqrt(determinant))/(2f*a);
-			if (t1 > 0f) {
-				if (t2 > 0f)
-					return Mathf.Min(t1, t2); //both are positive
-				else
-					return t1; //only t1 is positive
-			} else
-				return Mathf.Max(t2, 0f); //don't shoot back in time
-		} else if (determinant < 0f) //determinant < 0; no intercept path
-			return 0f;
-		else //determinant = 0; one intercept path, pretty much never happens
-			return Mathf.Max(-b/(2f*a), 0f); //don't shoot back in time
-	}
-
-	private void InitStyles(Color col)	
-	{
-		if( currentStyle == null )	
-		{			
-			currentStyle = new GUIStyle( GUI.skin.box );			
-			currentStyle.normal.background = targetTexture;
-		}
-	}
-
-	private Texture2D MakeTex( int width, int height, Color col )
-	{
-		Color[] pix = new Color[width * height];
-		for( int i = 0; i < pix.Length; i++)	
-		{
-			pix[ i ] = col;
-		}
-		Texture2D result = new Texture2D( width, height );
-		result.SetPixels( pix );
-		
-		result.Apply();
-		
-		return result;
-	}
+	}	
 }

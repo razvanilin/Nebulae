@@ -29,10 +29,10 @@ public class CheckPlayerCollision : MonoBehaviour {
 		{
 			if (isImmune)
 			{
-				player.rigidbody.velocity = new Vector3(0,0,0);
-				player.rigidbody.angularVelocity = new Vector3(0,0,0);
-				player.rigidbody.isKinematic = true;
+				/*player.rigidbody.velocity = new Vector3(0,0,0);
+				player.rigidbody.angularVelocity = new Vector3(0,0,0);*/
 				playerContr.Acceleration = 0f;
+				player.rigidbody.isKinematic = true;
 				tempTime += Time.deltaTime;
 				if (tempTime >= immunityTime)
 				{
@@ -97,9 +97,9 @@ public class CheckPlayerCollision : MonoBehaviour {
 	[RPC]
 	void ResetPlayer()
 	{
+		player.rigidbody.isKinematic = false;
 		player.transform.position = new Vector3(0,0,0);
 		player.transform.rotation = Quaternion.identity;
 		player.renderer.enabled = true;
-		player.rigidbody.isKinematic = false;
 	}
 }

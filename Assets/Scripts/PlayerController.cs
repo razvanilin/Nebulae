@@ -88,11 +88,13 @@ public class PlayerController : MonoBehaviour {
 	void MovePlayer(float tempAcc)
 	{
 		acceleration = Mathf.Lerp(acceleration, tempAcc, Time.deltaTime * accelerationDamp);
-		rigidbody.velocity = (transform.forward * acceleration) 
-			+ (transform.up * Input.GetAxis("Vertical") * strafeSpeed)
-				+ (transform.right * Input.GetAxis("Horizontal") * strafeSpeed);
-		
-		rigidbody.angularVelocity = transform.forward * Input.GetAxis("Tilt") * tiltSpeed;
+		if (!rigidbody.isKinematic)
+		{
+			rigidbody.velocity = (transform.forward * acceleration) 
+				+ (transform.up * Input.GetAxis("Vertical") * strafeSpeed)
+					+ (transform.right * Input.GetAxis("Horizontal") * strafeSpeed);
+			rigidbody.angularVelocity = transform.forward * Input.GetAxis("Tilt") * tiltSpeed;
+		}
 	}
 
 	[RPC]
