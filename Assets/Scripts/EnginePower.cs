@@ -5,8 +5,12 @@ public class EnginePower : MonoBehaviour {
 
 	public float engineEmission = 1000f;
 	public float maxEmission = 10000f;
+	public float engineSoundFactor = 0.05f;
+	public float enginePitchFactor = 0.2f;
 
 	public PlayerController player;
+
+	private AudioSource audioSource;
 	private float acceleration ;
 	public float Acceleration
 	{
@@ -17,6 +21,7 @@ public class EnginePower : MonoBehaviour {
 	void Start () 
 	{
 		particleEmitter.emit = false;
+		audioSource = GetComponent<AudioSource>();
 	}
 
 	void Update () 
@@ -25,17 +30,24 @@ public class EnginePower : MonoBehaviour {
 		//Debug.Log(particleEmitter.minEmission);
 		if (acceleration > 0)
 			particleEmitter.emit = true;
-		EmitEngineParticles();
-		/*if (acceleration != 0)
-			networkView.RPC("EmitEngineParticles", RPCMode.All);*/
+		//EmitEngineParticles();
+		if (networkView.isMine)
+		{
+			if (audioSource.volume<0.3f)
+				audioSource.volume = engineSoundFactor * acceleration;
+			audioSource.pitch = enginePitchFactor * (acceleration);
+		}
+		if (acceleration >= 0)
+			networkView.RPC("EmitEngineParticles", RPCMode.All);
 	}
-	
+
+	[RPC]
 	void EmitEngineParticles()
 	{
 		//if (particleEmitter.minEmission <= maxEmission || acceleration <= 0)
 		//{
-			particleEmitter.minEmission = acceleration * engineEmission;
-			particleEmitter.maxEmission = acceleration * engineEmission;
-		//}
+		particleEmitter.minEmission = acceleration * engineEmission;
+		particleEmitter.maxEmission = acceleration * engineEmission;
+
 	}
 }

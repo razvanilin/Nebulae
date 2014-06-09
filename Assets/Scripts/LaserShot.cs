@@ -4,43 +4,62 @@ using System.Collections;
 public class LaserShot : MonoBehaviour {
 
 	public float speed;
-	public float life;
+	public float laserDistance;
 	public ParticleEmitter destroyEffect;
 
-	private float timePassed;
-	
+	private Vector3 startPosition;
+	private float distanceTraveled;
+	private GameObject[] playerBody;
+	private Vector3 shipVelocity = Vector3.zero;
+	private ScoreWindow scoreWindow;
+	private string owner;
+
+	public Vector3 ShipVelocity
+	{
+		get{return shipVelocity;}
+		set{shipVelocity = value;}
+	}
+
+	void GetShipVelocity(Vector3 velocity)
+	{
+		shipVelocity = velocity;
+	}
+
 	void Start () 
 	{
-		rigidbody.velocity = transform.forward * speed;
-
+		if (true)
+		{
+			startPosition = transform.position;
+			rigidbody.velocity = shipVelocity + (transform.forward * Time.deltaTime * speed);
+			scoreWindow = GameObject.FindGameObjectWithTag("ScoreWindow").GetComponent<ScoreWindow>();
+		}
 	}
 
 	void Update()
 	{
-		timePassed += Time.deltaTime;
+		//Debug.Log(shipVelocity);
+		distanceTraveled = Vector3.Distance(transform.position, startPosition);
 
-		if (timePassed >= life)
+		if (distanceTraveled >= laserDistance)
 		{
 			Destroy(gameObject);
-			DestroyChildren();
+			//networkView.RPC("DestroyLaser", RPCMode.All);
 		}
 	}
 
 	void OnTriggerEnter(Collider other)
 	{
-		ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
-		//emitter.Emit();
-		Destroy(gameObject);
-		DestroyChildren();
+		//playerBody = GameObject.FindGameObjectsWithTag("Player Body");
+		if (other.tag != "Radar" && other.tag != "Laser")
+		{
+			ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
+			Destroy(gameObject);
+		}
 	}
 
-	void DestroyChildren()
+	public string Owner
 	{
-		int childs = transform.childCount;
-		
-		for (int i = childs - 1; i > 0; i--)	
-		{
-			GameObject.Destroy(transform.GetChild(i).gameObject);
-		}
+		get{return owner;}
+		set{owner = value;}
 	}
 }

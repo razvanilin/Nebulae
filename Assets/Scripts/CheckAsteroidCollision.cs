@@ -3,21 +3,31 @@ using System.Collections;
 
 public class CheckAsteroidCollision : MonoBehaviour {
 
-	public int asteroidLife = 3;
+	public float asteroidLife = 3;
 	public Transform explosion;
 	public GameObject asteroid;
 	public AudioClip explosionClip;
+
+	void Start()
+	{
+		asteroidLife *= transform.localScale.x;
+	}
 	
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.tag == "Laser")
 		{
 			asteroidLife--;
+		}
+		if (other.tag == "Player")
+		{
+			asteroidLife -= 5;
+		}
 
-			if (asteroidLife <= 0)
-			{
-				networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
-			}
+		if (asteroidLife <= 0)
+		{
+			networkView.RPC("DestroyAsteroid", RPCMode.AllBuffered);
+			//networkView.RPC("AsteroidEffects", RPCMode.All);
 		}
 	}
 
@@ -25,8 +35,15 @@ public class CheckAsteroidCollision : MonoBehaviour {
 	void DestroyAsteroid()
 	{
 		Instantiate(explosion, transform.position, transform.rotation);
-		AudioSource.PlayClipAtPoint(explosionClip, transform.position);
+		AudioSource.PlayClipAtPoint(explosionClip, transform.position, 1f);
 		Destroy(asteroid);
 	}
+
+	/*[RPC]
+	void AsteroidEffects()
+	{
+		Instantiate(explosion, transform.position, transform.rotation);
+		AudioSource.PlayClipAtPoint(explosionClip, transform.position, 1f);
+	}*/
 	
 }
