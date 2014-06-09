@@ -33,7 +33,8 @@ public class EnginePower : MonoBehaviour {
 		//EmitEngineParticles();
 		if (networkView.isMine)
 		{
-			audioSource.volume = engineSoundFactor * acceleration;
+			if (audioSource.volume<0.3f)
+				audioSource.volume = engineSoundFactor * acceleration;
 			audioSource.pitch = enginePitchFactor * (acceleration);
 		}
 		if (acceleration >= 0)

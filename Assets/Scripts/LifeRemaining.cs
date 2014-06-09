@@ -9,7 +9,10 @@ public class LifeRemaining : MonoBehaviour {
 	void Update () 
 	{
 		if (networkView.isMine)
+		{
+			Debug.Log(player.LifeLeft);
 			guiText.text = player.LifeLeft + "%";
+		}
 	}
 	
 }

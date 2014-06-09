@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour {
 	private bool haltFlag;
 	private AudioListener listener;
 	private float hitdist = 10f;
+	private bool left = true;
 
 	void Start()
 	{
@@ -31,13 +32,13 @@ public class PlayerController : MonoBehaviour {
 		listener = GetComponent<AudioListener>();
 		if (!networkView.isMine)
 			listener.enabled = false;
+		rigidbody.position = new Vector3(Random.Range(-100, 100), Random.Range(-100, 100), Random.Range(-100, 100));
 	}
 
 	void FixedUpdate ()
 	{
 		if (networkView.isMine)
 		{
-			//transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * Time.deltaTime * sensitivity);
 			if (Input.GetButton("Turn"))
 			{
 				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -47,10 +48,6 @@ public class PlayerController : MonoBehaviour {
 			}
 
 			// Keyboard Inputs
-			/*float moveHorizontal = Input.GetAxis("Horizontal");
-			float moveVertical = Input.GetAxis("Vertical");
-
-			Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);*/
 			float tempAcc = 0f;
 			if (!haltFlag)
 				tempAcc = acceleration;
@@ -78,6 +75,7 @@ public class PlayerController : MonoBehaviour {
 			// Shooting lasers
 			if (Input.GetButton("Fire1") && nextFire >= fireRate)
 			{
+				left = !left;
 				nextFire = 0f;
 				networkView.RPC("LaserShot", RPCMode.All, rigidbody.velocity);
 			}
@@ -98,16 +96,25 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	[RPC]
-	void LaserShot(Vector3 shipVelocity)
+	void LaserShot(Vector3 shipVelocity, NetworkMessageInfo info)
 	{
-
-		GameObject laser1 = Instantiate(laser, gun1.transform.position, gun1.transform.rotation) as GameObject;
-		GameObject laser2 = Instantiate(laser, gun2.transform.position, gun2.transform.rotation) as GameObject;
-		laser1.SendMessage("GetShipVelocity", rigidbody.velocity);
-		laser2.SendMessage("GetShipVelocity", rigidbody.velocity);
-
-		if (networkView.isMine)
-			AudioSource.PlayClipAtPoint(shotClip, transform.position, 0.3f);
+		if (true)
+		{
+			if(left)
+			{
+				GameObject laser1 = Instantiate(laser, gun1.transform.position, gun1.transform.rotation) as GameObject;
+				laser1.SendMessage("GetShipVelocity", rigidbody.velocity);
+				laser1.GetComponent<LaserShot>().Owner = info.sender.guid;
+			}
+			if (!left)
+			{
+				GameObject laser2 = Instantiate(laser, gun2.transform.position, gun2.transform.rotation) as GameObject;
+				laser2.SendMessage("GetShipVelocity", rigidbody.velocity);
+				laser2.GetComponent<LaserShot>().Owner = info.sender.guid;
+			}
+			if (networkView.isMine)
+				AudioSource.PlayClipAtPoint(shotClip, transform.position, 0.3f);
+		}
 	}
 
 	public float Acceleration

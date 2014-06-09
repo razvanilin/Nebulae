@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class NetworkManager : MonoBehaviour {
 
 	public GameObject playerPrefab;
-	public GameObject asteroidPrefab;
+	public GameObject scoreWindow;
 	public GameObject introObject;
 	public AudioClip playerConnectedClip;
 	public AudioClip playerDisconnectedClip;
@@ -20,7 +20,7 @@ public class NetworkManager : MonoBehaviour {
 	private float timePassed = 0f;
 	private State gameState;
 	private List<Player> playerList = new List<Player>();
-
+	
 	void Start()
 	{
 		MasterServer.ipAddress = "188.226.229.203";
@@ -30,10 +30,12 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnServerInitialized()
 	{
+		//Network.Instantiate(scoreWindow, Vector3.zero, Quaternion.identity, 0);
 		sceneFadeIn.EndScene();
 		Debug.Log("Server Initializied");
 		//Network.Instantiate(asteroidPrefab, new Vector3(0f, 5f, 10f), Quaternion.identity, 0);
 		//StartCoroutine(CRoutine());
+		//Network.Instantiate(scoreWindow, Vector3.zero, Quaternion.identity, 0);
 		SpawnPlayer();
 	}
 
@@ -80,7 +82,9 @@ public class NetworkManager : MonoBehaviour {
 				StartServer();
 			}
 			if (GUI.Button(new Rect(100, 300, 250, 100), "Look for Nebulae"))
+			{
 				RefreshHostList();
+			}
 			if (GUI.Button(new Rect(100, 400, 250, 100), "Exit the Nebula"))
 			{
 				sceneFadeIn.EndScene();
@@ -93,6 +97,10 @@ public class NetworkManager : MonoBehaviour {
 					if (GUI.Button(new Rect(400, 150 + (110 * i), 300, 100), hostList[i].gameName + "_" + i))
 						JoinServer(hostList[i]);
 				}
+			}
+			else if (hostList != null && hostList.Length == 0)
+			{
+				GUI.Label(new Rect(400, 150, 300, 100), "Press 'Look for Nebulae' to find other servers");
 			}
 		}
 	}
@@ -132,7 +140,7 @@ public class NetworkManager : MonoBehaviour {
 	private void SpawnPlayer()
 	{
 		gameState.GState = State.GameState.PLAY;
-		Network.Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+		Network.Instantiate(playerPrefab, new Vector3(0,0,0), Quaternion.identity, 0);
 		Destroy(introObject);
 	}
 }

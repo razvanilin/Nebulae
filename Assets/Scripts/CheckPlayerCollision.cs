@@ -9,8 +9,9 @@ public class CheckPlayerCollision : MonoBehaviour {
 	public AudioClip explosionClip;
 	public GameObject player;
 	public PlayerController playerContr;
-	public ScoreWindow scoreWindow;
 
+
+	private ScoreWindow scoreWindow;
 	private float tempTime = 0f;
 	private bool isImmune = false;
 	private AudioSource audioSource;
@@ -21,6 +22,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 	{
 		lifeLeft = playerLife;
 		audioSource = GetComponent<AudioSource>();
+		scoreWindow = GameObject.FindGameObjectWithTag("ScoreWindow").GetComponent<ScoreWindow>();
 	}
 
 	void Update()
@@ -36,7 +38,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 				tempTime += Time.deltaTime;
 				if (tempTime >= immunityTime)
 				{
-					networkView.RPC("ResetPlayer", RPCMode.All);
+					networkView.RPC("ResetPlayer", RPCMode.AllBuffered);
 					isImmune = false;
 					tempTime = 0f;
 				}
@@ -51,6 +53,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 			if (other.tag == "Laser" && !isImmune)
 			{
 				networkView.RPC("InflictDamage", RPCMode.All, 3);
+				Debug.Log(other.gameObject.GetComponent<LaserShot>().Owner);
 			}
 			if (other.tag == "Asteroid" && !isImmune)
 			{
@@ -58,12 +61,19 @@ public class CheckPlayerCollision : MonoBehaviour {
 				if (!audioSource.isPlaying)
 					audioSource.Play();
 			}
+
 			if (lifeLeft <= 0)
 			{
 				networkView.RPC("DestroyPlayer", RPCMode.AllBuffered);
+				networkView.RPC ("ReportKill", RPCMode.AllBuffered, other.GetComponent<LaserShot>().Owner);
 			}
 		}
-
+	}
+	
+	[RPC]
+	void ReportKill(string netPlayer)
+	{
+		scoreWindow.AddKill(netPlayer);
 	}
 
 	[RPC]
@@ -76,7 +86,7 @@ public class CheckPlayerCollision : MonoBehaviour {
 
 
 	[RPC]
-	void DestroyPlayer()
+	void DestroyPlayer(NetworkMessageInfo info)
 	{
 		AudioSource.PlayClipAtPoint(explosionClip, transform.position);
 		Instantiate(explosionEffect, transform.position, transform.rotation);
@@ -87,10 +97,9 @@ public class CheckPlayerCollision : MonoBehaviour {
 		playerContr.Acceleration = 0f;*/
 		player.renderer.enabled = false;
 		lifeLeft = playerLife;
-		NetworkViewID netView = networkView.viewID;
-		Debug.Log(netView.owner.ipAddress);
-		scoreWindow.AddPoint(netView.owner);
-		
+
+		scoreWindow.AddPoint(info.sender);
+
 		isImmune = true;
 	}
 

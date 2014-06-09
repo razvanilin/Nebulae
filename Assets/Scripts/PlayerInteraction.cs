@@ -8,7 +8,7 @@ public class PlayerInteraction : MonoBehaviour
 	public float chatY;
 	public int width = 400;
 	public int height = 200;
-	public ScoreWindow scoreWindow;
+	private ScoreWindow scoreWindow;
 
 	private bool usingChat = false;
 	private bool showChat = false;
@@ -39,7 +39,7 @@ public class PlayerInteraction : MonoBehaviour
 	{
 		window = new Rect(10, Screen.height - height+5, width, height);
 		playerName = PlayerPrefs.GetString("playerName", "");
-
+		scoreWindow = GameObject.FindGameObjectWithTag("ScoreWindow").GetComponent<ScoreWindow>();
 		if (playerName == "") playerName = "Pilot_Name_" + Random.Range(1, 999);
 	}
 
@@ -54,10 +54,6 @@ public class PlayerInteraction : MonoBehaviour
 	void OnServerInitialized()
 	{
 		ShowChatWindow();
-		/*PlayerNode newEntry = new PlayerNode();
-		newEntry.playerName = playerName;
-		newEntry.player = Network.player;
-		playerList.Add(newEntry);*/
 		networkView.RPC("AddPlayerToList", RPCMode.AllBuffered, playerName);
 		AddGameChatMessage(playerName + " has just joined the nebula!");
 	}
@@ -65,8 +61,7 @@ public class PlayerInteraction : MonoBehaviour
 	void OnPlayerDisconnected(NetworkPlayer netPlayer)
 	{
 		AddGameChatMessage("A player has disconnected from the nebula");
-		scoreWindow.RemovePlayer(netPlayer);
-		//playerList.Remove(netPlayer);
+		networkView.RPC("RemovePlayerFromList", RPCMode.All, netPlayer);
 	}
 
 	void OnDisconnectedFromServer()
@@ -75,11 +70,17 @@ public class PlayerInteraction : MonoBehaviour
 	}
 
 	[RPC]
-	void AddPlayerToList(string name)
+	void RemovePlayerFromList(NetworkPlayer netPlayer)
+	{
+		scoreWindow.RemovePlayer(netPlayer);
+	}
+
+	[RPC]
+	void AddPlayerToList(string name, NetworkMessageInfo info)
 	{
 		Player newEntry = new Player();
 		newEntry.Name = name;
-		newEntry.PlayerID = Network.player;
+		newEntry.PlayerID = info.sender;
 		scoreWindow.AddPlayer(newEntry);
 	}
 
@@ -127,15 +128,6 @@ public class PlayerInteraction : MonoBehaviour
 			}
 		}
 
-		/*if (Input.GetButton("Score Window"))
-		{
-			for (int i=0; i<playerList.Count; i++)
-			{
-				PlayerNode playerNode = playerList[i] as PlayerNode;
-				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), playerNode.playerName);
-			}
-		}*/
-
 		window = GUI.Window(5, window, GlobalChatWindow, "");
 	}
 
@@ -148,6 +140,9 @@ public class PlayerInteraction : MonoBehaviour
 		scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 		GUILayout.BeginHorizontal();
 		GUILayout.Label("Press 'H' to show/hide flight instructions.");
+		GUILayout.EndHorizontal();
+		GUILayout.BeginHorizontal();
+		GUILayout.Label("Press 'F' to show the score window.");
 		GUILayout.EndHorizontal();
 
 		foreach(ChatEntry entry in chatEntries)
@@ -223,7 +218,9 @@ public class PlayerInteraction : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update () {
-	
+	void Update () 
+	{
+		if (Input.GetButton("Tooltip"))
+			scoreWindow.AddPoint(Network.player);
 	}
 }

@@ -11,6 +11,8 @@ public class LaserShot : MonoBehaviour {
 	private float distanceTraveled;
 	private GameObject[] playerBody;
 	private Vector3 shipVelocity = Vector3.zero;
+	private ScoreWindow scoreWindow;
+	private string owner;
 
 	public Vector3 ShipVelocity
 	{
@@ -25,8 +27,12 @@ public class LaserShot : MonoBehaviour {
 
 	void Start () 
 	{
-		startPosition = transform.position;
-		rigidbody.velocity = shipVelocity + (transform.forward * Time.deltaTime * speed);
+		if (true)
+		{
+			startPosition = transform.position;
+			rigidbody.velocity = shipVelocity + (transform.forward * Time.deltaTime * speed);
+			scoreWindow = GameObject.FindGameObjectWithTag("ScoreWindow").GetComponent<ScoreWindow>();
+		}
 	}
 
 	void Update()
@@ -49,5 +55,11 @@ public class LaserShot : MonoBehaviour {
 			ParticleEmitter emitter = Instantiate(destroyEffect, transform.position, transform.rotation) as ParticleEmitter;
 			Destroy(gameObject);
 		}
+	}
+
+	public string Owner
+	{
+		get{return owner;}
+		set{owner = value;}
 	}
 }

@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour {
 	public int cursorSizeY = 20;
 	public float musicFadeSpeed = 0.5f;
 	public GUISkin guiSkin;
+	public string nebulaName = "Maya's Horizon Nebula";
 	
 	//public AudioClip backgroundMusic;
 	private float delayTime = 0.5f;
@@ -20,6 +21,10 @@ public class GameController : MonoBehaviour {
 	private GameObject tooltip;
 	private float tooltipDelay = 0.5f;
 	private bool showMenu = false;
+	private bool showNebula = true;
+	private string nebulaGUI;
+	private float nebulaTime = 15f;
+	private float tempNebulaTime = 0f;
 	// Use this for initialization
 	void Start () 
 	{
@@ -41,7 +46,6 @@ public class GameController : MonoBehaviour {
 			tempTime+=Time.deltaTime;
 			if (Input.GetButton("Tooltip") && tempTime>tooltipDelay)
 			{
-				Debug.Log("Tooltip");
 				tooltip.SetActive(!tooltip.activeInHierarchy);
 				tempTime = 0f;
 			}
@@ -50,6 +54,13 @@ public class GameController : MonoBehaviour {
 				showMenu = !showMenu;
 				tempTime = 0f;
 			}
+
+			if (showNebula)
+			{
+				StartCoroutine(AnimateText(nebulaName));
+				showNebula = false;
+			}
+
 			FadeMusic();
 			break;
 		default:
@@ -75,6 +86,21 @@ public class GameController : MonoBehaviour {
 			}
 			if (GUI.Button(new Rect(Screen.width/2 - 100, Screen.height/2 - 250, 200, 100), "Resume"))
 				showMenu = false;
+		}
+
+		tempNebulaTime += Time.deltaTime;
+		if (State.GetInstance().GState == State.GameState.PLAY && tempNebulaTime <= nebulaTime)
+		{
+			GUI.TextArea(new Rect(Screen.width/3, Screen.height/4, 400, 50), nebulaGUI);
+		}
+	}
+
+	IEnumerator AnimateText(string strComplete){
+		int i = 0;
+		nebulaGUI = "";
+		while( i < strComplete.Length ){
+			nebulaGUI += strComplete[i++];
+			yield return new WaitForSeconds(0.05F);
 		}
 	}
 

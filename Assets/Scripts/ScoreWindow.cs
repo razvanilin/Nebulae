@@ -6,9 +6,8 @@ public class ScoreWindow : MonoBehaviour {
 
 	public float width = 700f;
 	public float height = 400f;
-
-	//private ArrayList playerList = new ArrayList();
-	List<Player> playerList = new List<Player>();
+	
+	private List<Player> playerList = new List<Player>();
 	private Rect scoreWindow;
 
 	void Start()
@@ -20,12 +19,6 @@ public class ScoreWindow : MonoBehaviour {
 	{
 		if (Input.GetButton("Score Window"))
 		{
-			/*for(int i=0; i<playerList.Count; i++)
-			{
-				Player tempPlayer = playerList[i] as Player;
-				GUI.Box(new Rect(250, 100 + (110*i), 300, 50), tempPlayer.Name);
-			}*/
-
 			scoreWindow = GUI.Window(6, scoreWindow, DisplayScoreWindow, "");
 		}
 	}
@@ -39,7 +32,7 @@ public class ScoreWindow : MonoBehaviour {
 		foreach(Player player in playerList)
 		{
 			GUILayout.BeginHorizontal();
-			GUILayout.Label(player.Name + "\t | Kills: " + player.Kills + "\t | Deaths: " + player.Deaths);
+			GUILayout.Label(player.Name + "\t\t | Kills: " + player.Kills + "\t\t | Deaths: " + player.Deaths);
 			GUILayout.EndHorizontal();
 			GUILayout.Space(2);
 		}
@@ -54,33 +47,47 @@ public class ScoreWindow : MonoBehaviour {
 	{
 		for (int i = 0; i<playerList.Count; i++)
 		{
-			Player tempPlayer = playerList[i] as Player;
-			if (player == tempPlayer.PlayerID)
+			if (player.guid == playerList[i].PlayerID.guid)
 			{
 				playerList.RemoveAt(i);
-				return;
+				break;
 			}
 		}
-		//playerList.Remove(player);
+	}
+
+	public void AddKill(string player)
+	{
+		string id = (networkView.isMine) ? player : Network.player.guid;
+		List<Player> tempList = playerList;
+		for (int i=0; i<tempList.Count; i++)
+		{
+			if (id == tempList[i].PlayerID.guid)
+			{
+				tempList[i].Kills = tempList[i].Kills + 1;
+				break;
+			}
+		}
+		playerList = tempList;
 	}
 
 	public void AddPoint(NetworkPlayer player)
 	{
-		Debug.Log ("Add point accessed - " + playerList.Count);
-
-		if (playerList == null)
-			Debug.Log("List is null");
-
-		for (int i=0; i<playerList.Count; i++)
+		List<Player> tempList = playerList;
+		for (int i=0; i<tempList.Count; i++)
 		{
-			Debug.Log("here!" + i);
-			if (player == playerList[i].PlayerID)
+			if (player == tempList[i].PlayerID)
 			{
-				Debug.Log(playerList[i].Deaths);
-				playerList[i].Deaths = playerList[i].Deaths + 1;
-				Debug.Log(playerList[i].Deaths);
+				tempList[i].Deaths = tempList[i].Deaths + 1;
 				break;
 			}
 		}
-	}	
+		
+		playerList = tempList;
+	}
+
+	public List<Player> PlayerList
+	{
+		get{return playerList;}
+		set{playerList = value;}
+	}
 }
