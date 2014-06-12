@@ -18,15 +18,15 @@ public class WeaponRotation : MonoBehaviour {
 	{
 		if (networkView.isMine)
 		{
-			if (Input.GetButton("Turn"))
-			{
+			//if (Input.GetButton("Turn"))
+			//{
 				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 				Vector3 targetPoint = ray.GetPoint(hitdist);
 				networkView.RPC("Rotate", RPCMode.All, Quaternion.LookRotation(targetPoint - transform.position));
 				//transform.rotation = Quaternion.LookRotation(targetPoint - transform.position);
 				//transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 1f * Time.deltaTime);
-			}
-			else
+			//}
+			/*else
 			{
 				for (int i = 0; i<player.Length; i++)
 				{
@@ -34,7 +34,7 @@ public class WeaponRotation : MonoBehaviour {
 						networkView.RPC ("Rotate", RPCMode.All, player[i].transform.rotation);
 						//transform.rotation = player[i].transform.rotation;
 				}
-			}
+			}*/
 		}
 	}
 
